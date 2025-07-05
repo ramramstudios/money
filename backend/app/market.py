@@ -1,5 +1,6 @@
 import aiohttp
 import aioredis
+import yfinance as yf
 import json
 import yfinance as yf
 import asyncio
@@ -24,6 +25,7 @@ async def fetch_alpha_vantage(symbol: str):
 
 async def fetch_yfinance(symbol: str):
     ticker = yf.Ticker(symbol)
+    data = ticker.history(period="1d")
     try:
         data = await asyncio.to_thread(ticker.history, period="1d")
     except Exception:
@@ -39,6 +41,7 @@ async def get_market_data(symbol: str):
     cache_key = f"market:{symbol}"
     cached = await redis.get(cache_key)
     if cached:
+        return cached
         try:
             return json.loads(cached.decode())
         except Exception:
@@ -49,5 +52,5 @@ async def get_market_data(symbol: str):
         data = await fetch_yfinance(symbol)
 
     if data:
-        await redis.set(cache_key, json.dumps(data), ex=300)
+        await redis.set(cache_key, str(data), ex=300)
     return data

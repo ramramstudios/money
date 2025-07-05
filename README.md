@@ -23,6 +23,9 @@ shared/   - Pydantic models shared between frontend and backend
    ```bash
    pip install -r backend/requirements.txt
    ```
+   The backend uses **Pydantic v2**, so `pydantic-settings` is also required
+   for loading environment variables.
+
 3. Install frontend dependencies:
    ```bash
    cd frontend && npm install
