@@ -1,5 +1,6 @@
 import aiohttp
 import aioredis
+import json
 import yfinance as yf
 from .config import settings
 
@@ -34,12 +35,15 @@ async def get_market_data(symbol: str):
     cache_key = f"market:{symbol}"
     cached = await redis.get(cache_key)
     if cached:
-        return cached
+        try:
+            return json.loads(cached.decode())
+        except Exception:
+            return cached
 
     data = await fetch_alpha_vantage(symbol)
     if not data:
         data = await fetch_yfinance(symbol)
 
     if data:
-        await redis.set(cache_key, str(data), ex=300)
+        await redis.set(cache_key, json.dumps(data), ex=300)
     return data
