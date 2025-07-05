@@ -2,6 +2,7 @@ import aiohttp
 import aioredis
 import json
 import yfinance as yf
+import asyncio
 from .config import settings
 
 ALPHAVANTAGE_URL = "https://www.alphavantage.co/query"
@@ -23,7 +24,10 @@ async def fetch_alpha_vantage(symbol: str):
 
 async def fetch_yfinance(symbol: str):
     ticker = yf.Ticker(symbol)
-    data = ticker.history(period="1d")
+    try:
+        data = await asyncio.to_thread(ticker.history, period="1d")
+    except Exception:
+        return None
     if not data.empty:
         return {
             "price": data["Close"].iloc[-1]
