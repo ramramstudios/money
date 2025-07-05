@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+aioredis
+aiohttp
+yfinance
+requests
+numpy
+scipy
+python-dotenv
